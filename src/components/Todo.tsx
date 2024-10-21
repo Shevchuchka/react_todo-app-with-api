@@ -6,25 +6,23 @@ import { Todo } from '../types/Todo';
 import { useEffect, useRef, useState } from 'react';
 import { Loader } from './Loader';
 import { USER_ID } from '../api/todos';
-// import { event } from 'cypress/types/jquery';
 
 type Props = {
   todo: Todo;
-  activeTodo: Todo | null;
-  setActiveTodo: (todo: Todo) => void;
+  activeTodos: Todo[];
+  setActiveTodos: (todo: Todo[]) => void;
   onDelete: (todoId: number) => void;
   update: (todoToUpdate: Todo) => Promise<void>;
-  // update: (todoToUpdate: Todo) => void;
-  // errorFunction: (message: string) => void;
+  errorFunction: (message: string) => void;
   loadingState: boolean;
 };
 
 export const ToDo: React.FC<Props> = ({
   todo,
-  activeTodo,
-  setActiveTodo,
+  activeTodos,
+  setActiveTodos,
   update,
-  // errorFunction,
+  errorFunction,
   onDelete = () => {},
   loadingState,
 }) => {
@@ -32,7 +30,6 @@ export const ToDo: React.FC<Props> = ({
   const [title, setTitle] = useState(todo.title);
   const [todoStatus, setTodoStatus] = useState(todo.completed);
 
-  // const completedTodo = todoStatus;
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
   };
@@ -50,48 +47,41 @@ export const ToDo: React.FC<Props> = ({
   }, [todo]);
 
   const handleDelete = (todoToDelete: Todo) => {
-    setActiveTodo(todoToDelete);
+    setActiveTodos([todo]);
     onDelete(todoToDelete.id);
   };
 
   const handleUpdate = () => {
     setOnEdit(false);
-    setActiveTodo(todo);
-    const normalizedTitle = title.trim();
 
     const todoToUpdate: Todo = {
       id: todo.id,
-      title: normalizedTitle,
+      title: title.trim(),
       userId: USER_ID,
       completed: todoStatus,
     };
 
-    if (normalizedTitle === todo.title) {
-      setOnEdit(false);
-
-      // return;
-    }
-
-    if (normalizedTitle.length === 0) {
-      handleDelete(todo);
-
-      // return;
-    }
-
-    if (todoStatus !== todo.completed || normalizedTitle !== todo.title) {
+    if (title !== todo.title || todoToUpdate.completed !== todo.completed) {
       update(todoToUpdate)
         .then(() => {})
         .catch(() => {
-          // setTodoList(todos);
+          errorFunction('Unable to update a todo');
           setOnEdit(true);
         });
     }
+
+    if (todoToUpdate.title.length === 0) {
+      onDelete(todoToUpdate.id);
+    }
+
+    setOnEdit(false);
   };
 
   const submitUpdate = (
     event: React.FormEvent<HTMLInputElement | HTMLFormElement>,
   ) => {
     event.preventDefault();
+    setActiveTodos([todo]);
 
     handleUpdate();
   };
@@ -161,14 +151,15 @@ export const ToDo: React.FC<Props> = ({
             onSubmit={event => submitUpdate(event)}
             onBlur={() => handleUpdate()}
             onKeyUp={event => handleKeyUp(event)}
-            // onKeyUp={() => {
-            //   setOnEdit(false);
-            // }}
           />
         </form>
       )}
 
-      <Loader loadingState={loadingState} todo={todo} activeTodo={activeTodo} />
+      <Loader
+        loadingState={loadingState}
+        todo={todo}
+        activeTodos={activeTodos}
+      />
     </div>
   );
 };

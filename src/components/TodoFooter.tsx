@@ -1,20 +1,15 @@
 import { Todo } from '../types/Todo';
-import {
-  deleteTodo,
-  getActiveTodos,
-  getCompletedTodos,
-  getTodos,
-} from '../api/todos';
-import { useCallback, useState } from 'react';
+import { deleteTodo } from '../api/todos';
+import { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { Filter } from '../types/Filter';
 
 type Props = {
   todos: Todo[];
   setLoading: (value: boolean) => void;
-  setActiveTodo: (todo: Todo) => void;
+  setActiveTodos: (todo: Todo[]) => void;
   setTodos: (todos: Todo[]) => void;
-  filterTodos: (filteredTodos: Todo[]) => void;
+  setTodoList: (filteredTodos: Todo[]) => void;
   onDelete: (todoId: number) => void;
   errorFunction: (message: string) => void;
   loadingState: boolean;
@@ -22,10 +17,10 @@ type Props = {
 
 export const TodoFooter: React.FC<Props> = ({
   todos,
-  setActiveTodo,
+  setActiveTodos,
   setLoading,
   setTodos,
-  filterTodos,
+  setTodoList,
   errorFunction = () => {},
   loadingState,
 }) => {
@@ -43,9 +38,9 @@ export const TodoFooter: React.FC<Props> = ({
   const clearFunction = async (completed: Todo[]) => {
     const successesDeletes: number[] = [];
 
-    for (const completedTodo of completed) {
-      setActiveTodo(completedTodo);
+    setActiveTodos([...completed]);
 
+    for (const completedTodo of completed) {
       try {
         await deleteTodo(completedTodo.id);
         successesDeletes.push(completedTodo.id);
@@ -70,25 +65,35 @@ export const TodoFooter: React.FC<Props> = ({
   };
 
   const filterFunction = (filter: Filter) => {
-    setFilterType(filter);
-
     switch (filter) {
       case Filter.All:
-        getTodos().then(filterTodos);
+        setTodoList(todos);
         break;
 
       case Filter.Active:
-        getActiveTodos().then(filterTodos);
+        setTodoList(todos.filter(todo => !todo.completed));
         break;
 
       case Filter.Completed:
-        getCompletedTodos().then(filterTodos);
+        setTodoList(todos.filter(todo => todo.completed));
         break;
 
       default:
-        getTodos().then(filterTodos);
+        setTodos(todos);
     }
   };
+
+  const setFilter = (filter: Filter) => {
+    setFilterType(filter);
+
+    return filterFunction(filter);
+  };
+
+  useEffect(() => {
+    if (filterType) {
+      filterFunction(filterType);
+    }
+  }, [todos]);
 
   const findFilterKey = (value: string): string | undefined => {
     return Object.keys(Filter).find(
@@ -110,7 +115,8 @@ export const TodoFooter: React.FC<Props> = ({
             className={classNames('filter__link', {
               selected: filterType === filter,
             })}
-            onClick={() => filterFunction(filter)}
+            // onClick={() => filterFunction(filter)}
+            onClick={() => setFilter(filter)}
             data-cy={`FilterLink${findFilterKey(filter)}`}
           >
             {findFilterKey(filter)}

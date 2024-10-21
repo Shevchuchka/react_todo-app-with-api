@@ -5,7 +5,7 @@ import { updateTodo, USER_ID } from '../api/todos';
 
 type Props = {
   todos: Todo[];
-  // todoList: Todo[];
+  todoList: Todo[];
   loadingState: boolean;
   setTodoList: (todos: Todo[]) => void;
   setTodos: (todos: Todo[]) => void;
@@ -14,23 +14,22 @@ type Props = {
     { userId, title, completed }: Omit<Todo, 'id'>,
   ) => Promise<void>;
   setLoading: (value: boolean) => void;
-  setActiveTodo: (todo: Todo) => void;
+  setActiveTodos: (todo: Todo[]) => void;
   errorFunction?: (message: string) => void;
 };
 
 export const TodoHeader: React.FC<Props> = ({
   todos,
-  // todoList,
+  todoList,
   loadingState,
   setLoading,
-  setActiveTodo,
   setTodoList,
   setTodos,
   addTodo,
+  setActiveTodos,
   errorFunction = () => {},
 }) => {
   const [query, setQuery] = useState('');
-  // const [updatedTodos, setUpdatedTodos] = useState<Todo[]>(todos);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -78,16 +77,17 @@ export const TodoHeader: React.FC<Props> = ({
   };
 
   const toggleAllFunction = async () => {
-    let todosToUpdate: Todo[] = todos;
+    // let todosToUpdate: Todo[] = todos;
+    let todosToUpdate: Todo[] = todoList;
     const updatedTodos: Todo[] = [];
 
     if (!checkActiveTodos()) {
       todosToUpdate = todos.filter(todo => !todo.completed);
     }
 
-    for (const currentTodo of todosToUpdate) {
-      setActiveTodo(currentTodo);
+    setActiveTodos([...todosToUpdate]);
 
+    for (const currentTodo of todosToUpdate) {
       const tempTodo: Todo = {
         id: currentTodo.id,
         title: currentTodo.title,
@@ -99,19 +99,8 @@ export const TodoHeader: React.FC<Props> = ({
         const updatedTodo = await updateTodo(tempTodo);
 
         updatedTodos.push(updatedTodo);
-
-        // setUpdatedTodos(currentTodos => {
-        //   const newTodos = [...currentTodos];
-        //   const indexOfUpdatedTodo = newTodos.findIndex(
-        //     todo => todo.id === updatedTodo.id,
-        //   );
-
-        //   newTodos.splice(indexOfUpdatedTodo, 1, updatedTodo);
-
-        //   return newTodos;
-        // });
-      } catch {
-        errorFunction('Unable to update todos');
+      } catch (error) {
+        throw error;
       }
     }
 
@@ -132,6 +121,8 @@ export const TodoHeader: React.FC<Props> = ({
         });
 
         setTodos(newTodos);
+      } catch {
+        errorFunction('Unable to update todos');
       } finally {
         setLoading(false);
       }

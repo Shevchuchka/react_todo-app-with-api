@@ -14,7 +14,7 @@ type Props = {
 export const TodoContent: React.FC<Props> = ({ errorFunction = () => {} }) => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todoList, setTodoList] = useState<Todo[]>(todos);
-  const [activeTodo, setActiveTodo] = useState<Todo | null>(null);
+  const [activeTodos, setActiveTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export const TodoContent: React.FC<Props> = ({ errorFunction = () => {} }) => {
     };
 
     setTodoList([...todos, tempTodo]);
-    setActiveTodo(tempTodo);
+    setActiveTodos([tempTodo]);
 
     return createTodo({ userId, title, completed })
       .then(newTodo => setTodos([...todos, newTodo]))
@@ -62,17 +62,14 @@ export const TodoContent: React.FC<Props> = ({ errorFunction = () => {} }) => {
 
   const updateFunction = (todoToUpdate: Todo) => {
     setLoading(true);
-    const newActiveTodo = todos.find(todo => todo.id === todoToUpdate.id);
-
-    if (newActiveTodo) {
-      setActiveTodo(newActiveTodo);
-    }
 
     setTodoList(currentTodos => {
       return currentTodos.map(todo =>
         todo.id === todoToUpdate.id ? todoToUpdate : todo,
       );
     });
+
+    setActiveTodos([todoToUpdate]);
 
     return updateTodo(todoToUpdate)
       .then(updatedTodo => {
@@ -82,8 +79,8 @@ export const TodoContent: React.FC<Props> = ({ errorFunction = () => {} }) => {
           );
         });
       })
-      .catch(() => {
-        errorFunction('Unable to add a todo');
+      .catch(error => {
+        throw error;
       })
       .finally(() => setLoading(false));
   };
@@ -95,34 +92,33 @@ export const TodoContent: React.FC<Props> = ({ errorFunction = () => {} }) => {
       <div className="todoapp__content">
         <TodoHeader
           todos={todos}
+          todoList={todoList}
           setTodoList={setTodoList}
-          // todoList={todoList}
           setTodos={setTodos}
           addTodo={addFunction}
-          setActiveTodo={setActiveTodo}
+          setActiveTodos={setActiveTodos}
           setLoading={setLoading}
           loadingState={loading}
           errorFunction={errorFunction}
-          // updateFunction={updateFunction}
         />
 
         {todos.length > 0 && (
           <>
             <TodoList
-              activeTodo={activeTodo}
-              setActiveTodo={setActiveTodo}
+              activeTodos={activeTodos}
+              setActiveTodos={setActiveTodos}
               todoList={todoList}
               loadingState={loading}
               onDelete={deleteFunction}
               update={updateFunction}
-              // errorFunction={errorFunction}
+              errorFunction={errorFunction}
             />
             <TodoFooter
-              filterTodos={setTodoList}
+              setTodoList={setTodoList}
               onDelete={deleteFunction}
               setLoading={setLoading}
               loadingState={loading}
-              setActiveTodo={setActiveTodo}
+              setActiveTodos={setActiveTodos}
               setTodos={setTodos}
               todos={todos}
               errorFunction={errorFunction}
