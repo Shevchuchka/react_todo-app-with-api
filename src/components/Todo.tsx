@@ -62,6 +62,7 @@ export const ToDo: React.FC<Props> = ({
     };
 
     if (title !== todo.title || todoToUpdate.completed !== todo.completed) {
+      // setActiveTodos([todo]);
       update(todoToUpdate)
         .then(() => {})
         .catch(() => {

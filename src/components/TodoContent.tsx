@@ -63,13 +63,11 @@ export const TodoContent: React.FC<Props> = ({ errorFunction = () => {} }) => {
   const updateFunction = (todoToUpdate: Todo) => {
     setLoading(true);
 
-    setTodoList(currentTodos => {
-      return currentTodos.map(todo =>
-        todo.id === todoToUpdate.id ? todoToUpdate : todo,
-      );
-    });
+    const activeTodo = todoList.find(todo => todo.id === todoToUpdate.id);
 
-    setActiveTodos([todoToUpdate]);
+    if (activeTodo) {
+      setActiveTodos([activeTodo]);
+    }
 
     return updateTodo(todoToUpdate)
       .then(updatedTodo => {

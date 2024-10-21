@@ -137,7 +137,7 @@ export const TodoHeader: React.FC<Props> = ({
           className={classNames('todoapp__toggle-all', {
             active: checkActiveTodos(),
           })}
-          onClick={() => handleToggleAll()}
+          onClick={handleToggleAll}
           data-cy="ToggleAllButton"
         />
       )}
