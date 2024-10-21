@@ -8,7 +8,7 @@ import { Todo } from '../types/Todo';
 import { createTodo, deleteTodo, getTodos, updateTodo } from '../api/todos';
 
 type Props = {
-  errorFunction?: (message: string) => void;
+  errorFunction: (message: string) => void;
 };
 
 export const TodoContent: React.FC<Props> = ({ errorFunction = () => {} }) => {

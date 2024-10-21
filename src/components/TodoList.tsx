@@ -20,7 +20,7 @@ export const TodoList: React.FC<Props> = ({
   activeTodos,
   setActiveTodos,
   update,
-  // errorFunction,
+  errorFunction,
   onDelete = () => {},
 }) => {
   return (
