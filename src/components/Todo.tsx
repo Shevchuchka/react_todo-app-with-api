@@ -52,7 +52,7 @@ export const ToDo: React.FC<Props> = ({
   };
 
   const handleUpdate = () => {
-    setOnEdit(false);
+    // setOnEdit(false);
 
     const todoToUpdate: Todo = {
       id: todo.id,
@@ -63,7 +63,9 @@ export const ToDo: React.FC<Props> = ({
 
     if (title !== todo.title || todoToUpdate.completed !== todo.completed) {
       update(todoToUpdate)
-        .then(() => {})
+        .then(() => {
+          return;
+        })
         .catch(() => {
           errorFunction('Unable to update a todo');
           setOnEdit(true);
