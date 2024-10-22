@@ -34,6 +34,13 @@ export const ToDo: React.FC<Props> = ({
     setTitle(event.target.value);
   };
 
+  const todoToUpdate: Todo = {
+    id: todo.id,
+    title: title.trim(),
+    userId: USER_ID,
+    completed: todoStatus,
+  };
+
   const todoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -52,40 +59,34 @@ export const ToDo: React.FC<Props> = ({
   };
 
   const handleUpdate = () => {
-    // setOnEdit(false);
-
-    const todoToUpdate: Todo = {
-      id: todo.id,
-      title: title.trim(),
-      userId: USER_ID,
-      completed: todoStatus,
-    };
-
-    if (title !== todo.title || todoToUpdate.completed !== todo.completed) {
-      update(todoToUpdate)
-        .then(() => {
-          return;
-        })
-        .catch(() => {
-          errorFunction('Unable to update a todo');
-          setOnEdit(true);
-        });
-    }
-
-    if (todoToUpdate.title.length === 0) {
-      onDelete(todoToUpdate.id);
-    }
-
     setOnEdit(false);
+
+    update(todoToUpdate)
+      .then(() => {})
+      .catch(() => {
+        errorFunction('Unable to update a todo');
+        setOnEdit(true);
+      });
+  };
+
+  const checkTitle = () => {
+    const newTitle = todoToUpdate.title;
+
+    if (newTitle.length === 0) {
+      handleDelete(todo);
+    } else if (newTitle === todo.title) {
+      setTitle(newTitle);
+      setOnEdit(false);
+    } else {
+      handleUpdate();
+    }
   };
 
   const submitUpdate = (
     event: React.FormEvent<HTMLInputElement | HTMLFormElement>,
   ) => {
     event.preventDefault();
-    setActiveTodos([todo]);
-
-    handleUpdate();
+    checkTitle();
   };
 
   const setTodoStatusFunction = () => {
@@ -109,7 +110,7 @@ export const ToDo: React.FC<Props> = ({
     <div
       data-cy="Todo"
       onDoubleClick={() => setOnEdit(true)}
-      className={classNames('todo', { completed: todoStatus })}
+      className={classNames('todo', { completed: todo.completed })}
     >
       <label
         htmlFor={`${todo.id}`}
@@ -150,7 +151,7 @@ export const ToDo: React.FC<Props> = ({
             value={title}
             onChange={event => onInputChange(event)}
             onSubmit={event => submitUpdate(event)}
-            onBlur={() => handleUpdate()}
+            onBlur={() => checkTitle()}
             onKeyUp={event => handleKeyUp(event)}
           />
         </form>
