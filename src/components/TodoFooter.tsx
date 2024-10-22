@@ -115,7 +115,6 @@ export const TodoFooter: React.FC<Props> = ({
             className={classNames('filter__link', {
               selected: filterType === filter,
             })}
-            // onClick={() => filterFunction(filter)}
             onClick={() => setFilter(filter)}
             data-cy={`FilterLink${findFilterKey(filter)}`}
           >

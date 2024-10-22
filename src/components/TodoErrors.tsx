@@ -24,7 +24,6 @@ export const TodoErrors: React.FC<Props> = ({
         onClick={() => closeError('')}
       />
       {errorMessage}
-      {/* Unable to update a todo */}
     </div>
   );
 };

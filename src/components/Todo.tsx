@@ -62,7 +62,6 @@ export const ToDo: React.FC<Props> = ({
     };
 
     if (title !== todo.title || todoToUpdate.completed !== todo.completed) {
-      // setActiveTodos([todo]);
       update(todoToUpdate)
         .then(() => {})
         .catch(() => {
@@ -146,7 +145,6 @@ export const ToDo: React.FC<Props> = ({
             type="text"
             className="todo__title-field"
             placeholder="Empty todo will be deleted"
-            // value="Todo is being edited now"
             value={title}
             onChange={event => onInputChange(event)}
             onSubmit={event => submitUpdate(event)}

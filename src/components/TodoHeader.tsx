@@ -77,7 +77,6 @@ export const TodoHeader: React.FC<Props> = ({
   };
 
   const toggleAllFunction = async () => {
-    // let todosToUpdate: Todo[] = todos;
     let todosToUpdate: Todo[] = todoList;
     const updatedTodos: Todo[] = [];
 
